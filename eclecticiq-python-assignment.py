@@ -22,9 +22,12 @@ sponsored_id_list = config.get_sponsored()
 
 class ProductFinder:
 
+    # Class method needs to have 'self' as first parameter
     def get_product_details(ids=[]):
         ids.extend(sponsored_id_list)
         cursor = db.cursor()
+
+        # Prevent SQL Injections for standardizing the params
         cursor.execute('''
             SELECT product_id, product_manual_data
             FROM product
@@ -33,6 +36,7 @@ class ProductFinder:
         return cursor.fetchall()
 
 
+# Restrict to specific file type "PDF" in this case
 tmp = pathlib.Path('/var/lib/app').glob('*')
 plist = []
 for p in tmp:
@@ -52,6 +56,7 @@ def render_product_manual(data):
     if not found_pdf:
         raise ValueError('Product PDF is not found')
 
+    # Using subprocess with shell=False
     os.system('convert {} {} /tmp/tmp_image.jpg'.format(
         d.get('manual_render_params', ''), d['manual_filename']))
 
